@@ -9,7 +9,7 @@ import (
 	"github.com/srik007/sensor-api/domain/valueObjects"
 )
 
-type Sensor struct {
+type SensorHandler struct {
 	sensorApp      application.SensorAppInterface
 	sensorGroupApp application.SensorGroupAppInterface
 }
@@ -20,14 +20,14 @@ var sensorGroupNames = []string{
 	"Phi", "Chi", "Psi", "Omega",
 }
 
-func NewSensor(sApp application.SensorAppInterface, sgApp application.SensorGroupAppInterface) *Sensor {
-	return &Sensor{
+func NewSensorHandler(sApp application.SensorAppInterface, sgApp application.SensorGroupAppInterface) *SensorHandler {
+	return &SensorHandler{
 		sensorApp:      sApp,
 		sensorGroupApp: sgApp,
 	}
 }
 
-func (s *Sensor) GenerateSensorGroups() {
+func (s *SensorHandler) GenerateSensorGroups() {
 
 	var sensorGroups []entity.SensorGroup
 
@@ -43,7 +43,7 @@ func (s *Sensor) GenerateSensorGroups() {
 	}
 }
 
-func (s *Sensor) GenerateSensors() {
+func (s *SensorHandler) GenerateSensors() {
 
 	var sensors []entity.Sensor
 
