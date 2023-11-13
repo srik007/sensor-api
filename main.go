@@ -41,6 +41,8 @@ func main() {
 
 	r.POST("/api/generate", sensorHandler.Generate)
 
+	r.POST("/api/monitor", sensorHandler.Monitor)
+
 	app_port := os.Getenv("PORT")
 
 	r.Run(":" + app_port)

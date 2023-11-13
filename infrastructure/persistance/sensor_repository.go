@@ -1,6 +1,8 @@
 package persistance
 
 import (
+	"fmt"
+
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/repository"
 	"gorm.io/gorm"
@@ -33,6 +35,15 @@ func (r *SensorRepository) SaveAll(sensors []entity.Sensor) ([]entity.Sensor, ma
 		if result.Error != nil {
 			panic(result.Error)
 		}
+
 	}
 	return sensors, nil
+}
+
+func (r *SensorRepository) GetAll() []entity.Sensor {
+	var sensors []entity.Sensor
+	if err := r.db.Find(&sensors).Error; err != nil {
+		fmt.Printf("Error retrieving products: " + err.Error())
+	}
+	return sensors
 }

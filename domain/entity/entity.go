@@ -22,6 +22,18 @@ type Sensor struct {
 	DataOutputRate valueobjects.DataOuputRate `gorm:"embedded"`
 }
 
+type Specie struct {
+	Name  string
+	Count int
+}
+
+type SensorData struct {
+	Transparency int
+	Temparature  valueobjects.Temparature `gorm:"embedded;"`
+	Specie       []Specie                 `gorm:"embedded;"`
+	Sensor       Sensor                   `gorm:"foreignKey:SensorId"`
+}
+
 func (s *Sensor) AfterCreate(tx *gorm.DB) (err error) {
 	sensorGroup := &SensorGroup{
 		Name:        s.CodeName.Name,

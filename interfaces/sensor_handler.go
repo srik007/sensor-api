@@ -8,6 +8,7 @@ import (
 	"github.com/srik007/sensor-api/application"
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/valueObjects"
+	"github.com/srik007/sensor-api/infrastructure/monitor"
 )
 
 type SensorHandler struct {
@@ -56,4 +57,12 @@ func (s *SensorHandler) Generate(c *gin.Context) {
 	}
 
 	c.JSON(200, "Data generated successfully.")
+}
+
+func (s *SensorHandler) Monitor(c *gin.Context) {
+	sensors := s.sensorApp.GetAll()
+	if len(sensors) > 0 {
+		monitor.Register(sensors)
+	}
+	c.JSON(202, "Triggred monitoring job.")
 }
