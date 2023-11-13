@@ -29,9 +29,3 @@ func (r *SensorGroupRepository) SaveAll(sensorGroups []entity.SensorGroup) ([]en
 	}
 	return sensorGroups, nil
 }
-
-// func (r *SensorGroupRepository) UpdateSensorCount(name string, count int) {
-// 	if err := r.db.Model(&entity.SensorGroup{}).Where("name = ?", name).Update("sensor_count", count); err != nil {
-// 		panic("Error updating sensor count")
-// 	}
-// }

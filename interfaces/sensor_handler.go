@@ -3,19 +3,21 @@ package interfaces
 import (
 	"fmt"
 	"math/rand"
-	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/srik007/sensor-api/application"
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/valueObjects"
 )
 
-var sensorGroupData = []string{"alpha", "gamma", "beta"}
-
 type Sensor struct {
 	sensorApp      application.SensorAppInterface
 	sensorGroupApp application.SensorGroupAppInterface
+}
+
+var sensorGroupNames = []string{
+	"Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa",
+	"Lambda", "Mu", "Nu", "Xi", "Omicron", "Pi", "Rho", "Sigma", "Tau", "Upsilon",
+	"Phi", "Chi", "Psi", "Omega",
 }
 
 func NewSensor(sApp application.SensorAppInterface, sgApp application.SensorGroupAppInterface) *Sensor {
@@ -25,24 +27,23 @@ func NewSensor(sApp application.SensorAppInterface, sgApp application.SensorGrou
 	}
 }
 
-func (s *Sensor) SaveSensorGroupData(c *gin.Context) {
+func (s *Sensor) GenerateSensorGroups() {
 
 	var sensorGroups []entity.SensorGroup
 
-	for _, value := range sensorGroupData {
+	for _, value := range sensorGroupNames {
 		sensorGroup := entity.SensorGroup{Name: value, SensorCount: 0}
 		sensorGroups = append(sensorGroups, sensorGroup)
 	}
 
-	data, error := s.sensorGroupApp.SaveAll(sensorGroups)
+	_, error := s.sensorGroupApp.SaveAll(sensorGroups)
 
 	if error != nil {
-		c.JSON(http.StatusInternalServerError, "Internal server error.")
+		fmt.Errorf("Failed to generate sensor groups.")
 	}
-	c.JSON(http.StatusCreated, data)
 }
 
-func (s *Sensor) SaveSensorData(c *gin.Context) {
+func (s *Sensor) GenerateSensors() {
 
 	var sensors []entity.Sensor
 
@@ -52,14 +53,11 @@ func (s *Sensor) SaveSensorData(c *gin.Context) {
 
 	for i := 0; i < numberOfSensors; i++ {
 
-		randomSensorGroupName := sensorGroupData[rand.Intn(len(sensorGroupData))]
+		randomSensorGroupName := sensorGroupNames[rand.Intn(len(sensorGroupNames))]
 
-		//Index should be fetch from entity layer and increment
 		codeName := entity.CodeName{Name: randomSensorGroupName}
 
 		coordiante := ocean3D.GetRandomCoordinates3D()
-
-		fmt.Printf("%v", coordiante)
 
 		dataOutputRate := valueObjects.DataOuputRate{Value: 10, Format: "seconds"}
 
@@ -68,10 +66,9 @@ func (s *Sensor) SaveSensorData(c *gin.Context) {
 		sensors = append(sensors, sensor)
 	}
 
-	data, error := s.sensorApp.SaveAll(sensors)
+	_, error := s.sensorApp.SaveAll(sensors)
 
 	if error != nil {
-		c.JSON(http.StatusInternalServerError, "Internal server error.")
+		fmt.Errorf("Failed to generate sensors")
 	}
-	c.JSON(http.StatusCreated, data)
 }

@@ -37,11 +37,11 @@ func main() {
 
 	sensor := interfaces.NewSensor(services.Sensor, services.SensorGroup)
 
+	sensor.GenerateSensorGroups()
+
+	sensor.GenerateSensors()
+
 	r := gin.Default()
-
-	r.POST("/sensor-groups", sensor.SaveSensorGroupData)
-
-	r.POST("/sensors", sensor.SaveSensorData)
 
 	app_port := os.Getenv("PORT")
 	if app_port == "" {
