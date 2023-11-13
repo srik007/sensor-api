@@ -1,8 +1,6 @@
 package persistance
 
 import (
-	"fmt"
-
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/repository"
 	"gorm.io/gorm"
@@ -25,9 +23,8 @@ func (r *SensorRepository) SaveAll(sensors []entity.Sensor) ([]entity.Sensor, ma
 		if err := r.db.Where("name = ?", sensor.CodeName.Name).First(&existingSensorGroup).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				sensor.CodeName.GroupId = 1
-				fmt.Printf("Given sensor not found")
 			} else {
-				panic("Error retrieving product: " + err.Error())
+				panic("Error retrieving sensor: " + err.Error())
 			}
 		} else {
 			sensor.CodeName.GroupId = uint64(existingSensorGroup.SensorCount) + 1
@@ -36,7 +33,6 @@ func (r *SensorRepository) SaveAll(sensors []entity.Sensor) ([]entity.Sensor, ma
 		if result.Error != nil {
 			panic(result.Error)
 		}
-		fmt.Println("SensorGroup created successfully:", sensor)
 	}
 	return sensors, nil
 }

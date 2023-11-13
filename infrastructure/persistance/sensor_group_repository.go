@@ -19,12 +19,8 @@ func NewSensorGroupRepository(db *gorm.DB) *SensorGroupRepository {
 var _ repository.SensorGroupRepository = &SensorGroupRepository{}
 
 func (r *SensorGroupRepository) SaveAll(sensorGroups []entity.SensorGroup) ([]entity.SensorGroup, map[string]string) {
-	fmt.Println(sensorGroups)
 	for _, sensorGroup := range sensorGroups {
-		result := r.db.Create(&sensorGroup)
-		if result.Error != nil {
-			panic(result.Error)
-		}
+		r.db.Create(&sensorGroup)
 		fmt.Println("SensorGroup created successfully:", sensorGroup)
 	}
 	return sensorGroups, nil

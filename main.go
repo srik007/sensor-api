@@ -30,22 +30,18 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	defer services.Close()
 
 	services.Automigrate()
 
-	sensor := interfaces.NewSensor(services.Sensor, services.SensorGroup)
-
-	sensor.GenerateSensorGroups()
-
-	sensor.GenerateSensors()
+	sensorHandler := interfaces.NewSensorHandler(services.Sensor, services.SensorGroup)
 
 	r := gin.Default()
 
-	app_port := os.Getenv("PORT")
-	if app_port == "" {
-		app_port = "8888"
+	r.POST("/api/generate", sensorHandler.Generate)
 
-		log.Fatal(r.Run(":" + app_port))
-	}
+	app_port := os.Getenv("PORT")
+
+	r.Run(":" + app_port)
 }
