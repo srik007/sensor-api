@@ -22,10 +22,6 @@ type Ocean3D struct {
 	MinZ, MaxZ float64
 }
 
-type Transparency int
-
-type Id int
-
 func NewOcean3D(minX, maxX, minY, maxY, minZ, maxZ float64) Ocean3D {
 	return Ocean3D{
 		MinX: minX, MaxX: maxX,

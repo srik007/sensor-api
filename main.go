@@ -35,13 +35,13 @@ func main() {
 
 	services.Automigrate()
 
-	sensorHandler := interfaces.NewSensorHandler(services.Sensor, services.SensorGroup)
+	sensorHandler := interfaces.NewSensorHandler(services.SensorRepository, services.SensorGroupRepository)
 
 	r := gin.Default()
 
-	r.POST("/api/generate", sensorHandler.Generate)
+	r.POST("/api/generate", sensorHandler.GenerateMetadata)
 
-	r.POST("/api/monitor", sensorHandler.Monitor)
+	r.POST("/api/schedule", sensorHandler.ScheduleJob)
 
 	app_port := os.Getenv("PORT")
 

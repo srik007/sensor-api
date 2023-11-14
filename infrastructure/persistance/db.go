@@ -10,9 +10,9 @@ import (
 )
 
 type Repositories struct {
-	Sensor      repository.SensorRepository
-	SensorGroup repository.SensorGroupRepository
-	db          *gorm.DB
+	SensorRepository      repository.SensorRepository
+	SensorGroupRepository repository.SensorGroupRepository
+	db                    *gorm.DB
 }
 
 func NewRepositories(DbDriver, DbUser, DbPassword, DbPort, DbHost, DbName string) (*Repositories, error) {
@@ -23,9 +23,9 @@ func NewRepositories(DbDriver, DbUser, DbPassword, DbPort, DbHost, DbName string
 	}
 
 	return &Repositories{
-		Sensor:      NewSensorRepository(db),
-		SensorGroup: NewSensorGroupRepository(db),
-		db:          db,
+		SensorRepository:      NewSensorRepository(db),
+		SensorGroupRepository: NewSensorGroupRepository(db),
+		db:                    db,
 	}, nil
 }
 

@@ -1,30 +1,30 @@
 package application
 
 import (
-	"github.com/srik007/sensor-api/domain/entity"
+	"github.com/srik007/sensor-api/domain/generators"
 	"github.com/srik007/sensor-api/domain/repository"
+	scheduler "github.com/srik007/sensor-api/domain/schedulers"
 )
 
 type SensorApp struct {
-	repository repository.SensorRepository
+	SensorRepository      repository.SensorRepository
+	SensorGroupRepository repository.SensorGroupRepository
 }
 
 type SensorAppInterface interface {
-	SaveAll(sensors []entity.Sensor) ([]entity.Sensor, map[string]string)
-	GetAll() []entity.Sensor
-	SaveData(sensorData entity.SensorData)
+	GenerateMetadata()
+	ScheduleJob()
 }
 
 var _ SensorAppInterface = &SensorApp{}
 
-func (s *SensorApp) SaveAll(sensors []entity.Sensor) ([]entity.Sensor, map[string]string) {
-	return s.repository.SaveAll(sensors)
+func (s *SensorApp) GenerateMetadata() {
+	generator := generators.NewGenerator(s.SensorRepository, s.SensorGroupRepository)
+	generator.GenerateSensorMetaData()
+	generator.GenerateSensorGroupMetaData()
 }
 
-func (s *SensorApp) GetAll() []entity.Sensor {
-	return s.repository.GetAll()
-}
-
-func (s *SensorApp) SaveData(sensorData entity.SensorData) {
-	s.repository.SaveData(sensorData)
+func (s *SensorApp) ScheduleJob() {
+	scheduler := scheduler.NewJob(s.SensorRepository)
+	scheduler.Run()
 }
