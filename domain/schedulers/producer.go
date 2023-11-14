@@ -6,7 +6,7 @@ import (
 	"github.com/srik007/sensor-api/domain/entity"
 )
 
-func (j *SchedulerJob) ProduceSensorData(sensor entity.Sensor) {
+func (j *SchedulerJob) Publish(sensor entity.Sensor) {
 	for {
 		time.Sleep(time.Duration(sensor.DataOutputRate.Value) * time.Second)
 		sensorData := sensor.GetFakeData()

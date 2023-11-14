@@ -12,7 +12,7 @@ import (
 type Repositories struct {
 	SensorRepository      repository.SensorRepository
 	SensorGroupRepository repository.SensorGroupRepository
-	db                    *gorm.DB
+	DataStore             *gorm.DB
 }
 
 func NewRepositories(DbDriver, DbUser, DbPassword, DbPort, DbHost, DbName string) (*Repositories, error) {
@@ -25,12 +25,12 @@ func NewRepositories(DbDriver, DbUser, DbPassword, DbPort, DbHost, DbName string
 	return &Repositories{
 		SensorRepository:      NewSensorRepository(db),
 		SensorGroupRepository: NewSensorGroupRepository(db),
-		db:                    db,
+		DataStore:             db,
 	}, nil
 }
 
 func (s *Repositories) Close() error {
-	sqlDb, err := s.db.DB()
+	sqlDb, err := s.DataStore.DB()
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +38,7 @@ func (s *Repositories) Close() error {
 }
 
 func (s *Repositories) Automigrate() error {
-	if err := s.db.AutoMigrate(&entity.Sensor{}, &entity.SensorGroup{}, &entity.SensorData{}); err != nil {
+	if err := s.DataStore.AutoMigrate(&entity.Sensor{}, &entity.SensorGroup{}, &entity.SensorData{}); err != nil {
 		panic(err)
 	}
 	return nil

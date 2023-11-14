@@ -35,6 +35,7 @@ func (s Species) Value() (driver.Value, error) {
 }
 
 type SensorData struct {
+	gorm.Model
 	Transparency uint
 	Temparature  valueobjects.Temparature `gorm:"embedded;"`
 	Species      Species                  `gorm:"type:text;"`

@@ -47,7 +47,7 @@ func getTransparency(depth float64) int {
 
 func pickRandomOceanSpecies() []Specie {
 	var oceanSpecies []Specie
-	numberONewSpecies := rand.Intn(5)
+	numberONewSpecies := rand.Intn(5) + 1
 	for i := 0; i < numberONewSpecies; i++ {
 		rand.New(rand.NewSource(time.Now().UnixNano()))
 		randomIndex := rand.Intn(len(oceanFishNames))

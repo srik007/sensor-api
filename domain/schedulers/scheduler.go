@@ -30,7 +30,7 @@ func (j *SchedulerJob) Run() {
 		mutex.Unlock()
 	}
 	for _, sensor := range sensors {
-		go j.RecieveSensorData(int(sensor.ID))
-		go j.ProduceSensorData(sensor)
+		go j.Listen(int(sensor.ID))
+		go j.Publish(sensor)
 	}
 }
