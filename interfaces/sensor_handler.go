@@ -61,9 +61,7 @@ func (s *SensorHandler) Generate(c *gin.Context) {
 
 func (s *SensorHandler) Monitor(c *gin.Context) {
 	sensors := s.sensorApp.GetAll()
-	monitorJob := &monitor.SensorDataMonitorJob{
-		SensorApp: s.sensorApp,
-	}
+	monitorJob := monitor.NewJob(s.sensorApp)
 	if len(sensors) > 0 {
 		monitorJob.Register(sensors)
 	}
