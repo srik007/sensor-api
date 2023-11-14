@@ -12,7 +12,7 @@ type SensorApp struct {
 type SensorAppInterface interface {
 	SaveAll(sensors []entity.Sensor) ([]entity.Sensor, map[string]string)
 	GetAll() []entity.Sensor
-	SaveData(sensorData []entity.SensorData)
+	SaveData(sensorData entity.SensorData)
 }
 
 var _ SensorAppInterface = &SensorApp{}
@@ -25,6 +25,6 @@ func (s *SensorApp) GetAll() []entity.Sensor {
 	return s.repository.GetAll()
 }
 
-func (s *SensorApp) SaveData(sensorData []entity.SensorData) {
+func (s *SensorApp) SaveData(sensorData entity.SensorData) {
 	s.repository.SaveData(sensorData)
 }

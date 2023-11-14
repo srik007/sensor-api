@@ -48,7 +48,7 @@ func (r *SensorRepository) GetAll() []entity.Sensor {
 	return sensors
 }
 
-func (r *SensorRepository) SaveData(sensorData []entity.SensorData) {
+func (r *SensorRepository) SaveData(sensorData entity.SensorData) {
 	if err := r.db.Save(&sensorData).Error; err != nil {
 		fmt.Errorf("Failed to update sensor data")
 	}
