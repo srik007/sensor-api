@@ -55,5 +55,4 @@ func (g *Generator) GenerateSensorGroupMetaData() {
 	if error != nil {
 		fmt.Errorf("Failed to generate sensor groups.")
 	}
-
 }

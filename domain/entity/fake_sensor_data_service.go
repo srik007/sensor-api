@@ -1,10 +1,9 @@
-package scheduler
+package entity
 
 import (
 	"math/rand"
 	"time"
 
-	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/valueObjects"
 )
 
@@ -23,11 +22,11 @@ var oceanFishNames = []string{
 	"TropicalTwoWingFlyingfish", "Wahoo", "WhiptailGulper", "WhiteRingGardenEel", "YellowfinTuna",
 }
 
-func generateFakeSensorData(sensor entity.Sensor) entity.SensorData {
+func GenerateFakeSensorData(sensor Sensor) SensorData {
 	temparature := getTemparature(sensor.Coordinate.Z)
 	transparency := getTransparency(sensor.Coordinate.Z)
 	fishSpecies := pickRandomOceanSpecies()
-	return entity.SensorData{
+	return SensorData{
 		Transparency: uint(transparency),
 		Temparature:  temparature,
 		Species:      fishSpecies,
@@ -46,13 +45,13 @@ func getTransparency(depth float64) int {
 	return int(100.0 - (depth/maxDepth)*100.0)
 }
 
-func pickRandomOceanSpecies() []entity.Specie {
-	var oceanSpecies []entity.Specie
+func pickRandomOceanSpecies() []Specie {
+	var oceanSpecies []Specie
 	numberONewSpecies := rand.Intn(5)
 	for i := 0; i < numberONewSpecies; i++ {
 		rand.New(rand.NewSource(time.Now().UnixNano()))
 		randomIndex := rand.Intn(len(oceanFishNames))
-		oceanSpecies = append(oceanSpecies, entity.Specie{Name: oceanFishNames[randomIndex], Count: 1 + rand.Intn(100)})
+		oceanSpecies = append(oceanSpecies, Specie{Name: oceanFishNames[randomIndex], Count: 1 + rand.Intn(100)})
 	}
 	return oceanSpecies
 }

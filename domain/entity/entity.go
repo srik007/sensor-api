@@ -57,3 +57,7 @@ func (s *Sensor) AfterCreate(tx *gorm.DB) (err error) {
 	tx.Save(&sensorGroup)
 	return nil
 }
+
+func (s *Sensor) GetFakeData() SensorData {
+	return GenerateFakeSensorData(*s)
+}
