@@ -41,7 +41,7 @@ func (s *SensorHandler) Generate(c *gin.Context) {
 	}
 
 	var sensors []entity.Sensor
-	numberOfSensors := 10
+	numberOfSensors := 1
 	ocean3D := valueObjects.NewOcean3D(-90.0, 90.0, -180.0, 180.0, 0.0, 100.0)
 	for i := 0; i < numberOfSensors; i++ {
 		randomSensorGroupName := sensorGroupNames[rand.Intn(len(sensorGroupNames))]
@@ -61,8 +61,11 @@ func (s *SensorHandler) Generate(c *gin.Context) {
 
 func (s *SensorHandler) Monitor(c *gin.Context) {
 	sensors := s.sensorApp.GetAll()
+	monitorJob := &monitor.SensorDataMonitorJob{
+		SensorApp: s.sensorApp,
+	}
 	if len(sensors) > 0 {
-		monitor.Register(sensors)
+		monitorJob.Register(sensors)
 	}
 	c.JSON(202, "Triggred monitoring job.")
 }

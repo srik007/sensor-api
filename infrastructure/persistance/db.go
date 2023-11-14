@@ -37,7 +37,9 @@ func (s *Repositories) Close() error {
 	return sqlDb.Close()
 }
 
-// This migrate all tables
 func (s *Repositories) Automigrate() error {
-	return s.db.AutoMigrate(&entity.Sensor{}, &entity.SensorGroup{})
+	if err := s.db.AutoMigrate(&entity.Sensor{}, &entity.SensorGroup{}, &entity.SensorData{}); err != nil {
+		panic(err)
+	}
+	return nil
 }

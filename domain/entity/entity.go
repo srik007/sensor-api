@@ -1,6 +1,9 @@
 package entity
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+
 	valueobjects "github.com/srik007/sensor-api/domain/valueObjects"
 	"gorm.io/gorm"
 )
@@ -15,23 +18,35 @@ type CodeName struct {
 	GroupId uint64 `gorm:"index:idx_member;"`
 }
 
-type Sensor struct {
-	ID             uint                       `gorm:"primaryKey;"`
-	CodeName       CodeName                   `gorm:"embedded;"`
-	Coordinate     valueobjects.Coordinate    `gorm:"embedded"`
-	DataOutputRate valueobjects.DataOuputRate `gorm:"embedded"`
-}
-
 type Specie struct {
 	Name  string
 	Count int
 }
 
+type Species []Specie
+
+func (s *Species) Scan(src interface{}) error {
+	return json.Unmarshal(src.([]byte), &s)
+}
+
+func (s Species) Value() (driver.Value, error) {
+	val, err := json.Marshal(s)
+	return string(val), err
+}
+
 type SensorData struct {
-	Transparency int
+	Transparency uint
 	Temparature  valueobjects.Temparature `gorm:"embedded;"`
-	Specie       []Specie                 `gorm:"embedded;"`
-	Sensor       Sensor                   `gorm:"foreignKey:SensorId"`
+	Species      Species                  `gorm:"type:text;"`
+	SensorId     uint                     `gorm:"index;primaryKey;"`
+	Sensor       Sensor                   `gorm:"references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+}
+
+type Sensor struct {
+	ID             uint                       `gorm:"primaryKey;"`
+	CodeName       CodeName                   `gorm:"embedded;"`
+	Coordinate     valueobjects.Coordinate    `gorm:"embedded"`
+	DataOutputRate valueobjects.DataOuputRate `gorm:"embedded"`
 }
 
 func (s *Sensor) AfterCreate(tx *gorm.DB) (err error) {
