@@ -15,11 +15,11 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/generate": {
+        "/createMetadata": {
             "post": {
-                "description": "Generate the meta data for sensors and sensor groups",
-                "summary": "Generate the sensor metadata (code name, coordaiates, data output rate) and sensor groups Ex: Gamma 3",
-                "operationId": "generate-sensor-metadata",
+                "description": "Create the meta data for sensors and sensor groups",
+                "summary": "Create sensor metadata and sensor group metadata",
+                "operationId": "create-sensor-metadata",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -186,7 +186,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Failure response",
                         "schema": {
-                            "$ref": "#/definitions/interfaces.ErrorResposne"
+                            "$ref": "#/definitions/interfaces.ErrorResponse"
                         }
                     }
                 }
@@ -254,7 +254,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Failure response",
                         "schema": {
-                            "$ref": "#/definitions/interfaces.ErrorResposne"
+                            "$ref": "#/definitions/interfaces.ErrorResponse"
                         }
                     }
                 }
@@ -270,6 +270,53 @@ const docTemplate = `{
                         "description": "Accepted",
                         "schema": {
                             "type": "text"
+                        }
+                    }
+                }
+            }
+        },
+        "/sensor/{codeName}/temperature/average": {
+            "get": {
+                "description": "Calculate average temparature by a sensor",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Calculates average temparature in a given time interval",
+                "operationId": "calculate-avg-temparature-by-sensor",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Start time in Unix timestamp",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "End time in Unix timestamp",
+                        "name": "till",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Code name of the sensor",
+                        "name": "codeName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/valueObjects.Temparature"
+                        }
+                    },
+                    "400": {
+                        "description": "Failure response",
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.ErrorResponse"
                         }
                     }
                 }
@@ -299,7 +346,7 @@ const docTemplate = `{
                 }
             }
         },
-        "interfaces.ErrorResposne": {
+        "interfaces.ErrorResponse": {
             "type": "object",
             "properties": {
                 "message": {

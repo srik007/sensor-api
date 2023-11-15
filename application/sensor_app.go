@@ -1,6 +1,8 @@
 package application
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/srik007/sensor-api/aggregators"
 	"github.com/srik007/sensor-api/domain/entity"
@@ -37,6 +39,7 @@ type SensorAppInterface interface {
 	CollectAverageTemparatureUnderGroup(groupName string) float64
 	CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature
 	CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature
+	CalculateAverageTemparatureBySensor(codeName entity.CodeName, startTime, endTime time.Time) valueObjects.Temparature
 }
 
 var _ SensorAppInterface = &SensorApp{}
@@ -73,4 +76,8 @@ func (s *SensorApp) CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax,
 
 func (s *SensorApp) CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature {
 	return s.AggregateQueryHandler.CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax)
+}
+
+func (s *SensorApp) CalculateAverageTemparatureBySensor(codeName entity.CodeName, startTime, endTime time.Time) valueObjects.Temparature {
+	return s.AggregateQueryHandler.CalculateAverageTemparatureBySensor(codeName, startTime, endTime)
 }

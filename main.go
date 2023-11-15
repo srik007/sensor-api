@@ -72,6 +72,8 @@ func main() {
 
 		v1.GET("/region/temperature/max", sensorHandler.CalculateMaxTemparatureInsideARegion)
 
+		v1.GET("/sensor/:codeName/temperature/average", sensorHandler.CalculateAverageTemparatureBySensor)
+
 	}
 
 	app_port := os.Getenv("PORT")

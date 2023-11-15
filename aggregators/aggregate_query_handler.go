@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/valueObjects"
@@ -112,4 +113,20 @@ func (a *AggregatorQueryHandler) CalculateMaxTemparatureInsideARegion(xMin, xMax
 		Scan(&maxTemparature)
 	maxTemparature.Scale = "Celsius"
 	return maxTemparature
+}
+
+func (a *AggregatorQueryHandler) CalculateAverageTemparatureBySensor(codeName entity.CodeName, startTime, endTime time.Time) valueObjects.Temparature {
+	var sensorId uint
+	var blah string
+	var avgTemparature valueObjects.Temparature
+	a.DataStore.Model(&entity.Sensor{}).
+		Select("id").
+		Where("sensors.name = ? AND sensors.group_id = ?", codeName.Name, codeName.GroupId).
+		Scan(&sensorId)
+	a.DataStore.Model(&entity.SensorData{}).
+		Select("AVG(sensor_data.value)").
+		Where("sensor_id = ? AND created_at BETWEEN ? AND ?", sensorId, startTime, endTime).
+		Scan(&blah)
+	avgTemparature.Scale = "Celsius"
+	return avgTemparature
 }

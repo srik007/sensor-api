@@ -14,7 +14,7 @@ definitions:
       transparency:
         type: number
     type: object
-  interfaces.ErrorResposne:
+  interfaces.ErrorResponse:
     properties:
       message:
         type: string
@@ -34,17 +34,16 @@ info:
   title: Underwater Sensor API
   version: "1.0"
 paths:
-  /generate:
+  /createMetadata:
     post:
-      description: Generate the meta data for sensors and sensor groups
-      operationId: generate-sensor-metadata
+      description: Create the meta data for sensors and sensor groups
+      operationId: create-sensor-metadata
       responses:
         "200":
           description: OK
           schema:
             type: text
-      summary: 'Generate the sensor metadata (code name, coordaiates, data output
-        rate) and sensor groups Ex: Gamma 3'
+      summary: Create sensor metadata and sensor group metadata
   /group/{groupName}/species:
     get:
       description: Get total species by group name.
@@ -156,7 +155,7 @@ paths:
         "400":
           description: Failure response
           schema:
-            $ref: '#/definitions/interfaces.ErrorResposne'
+            $ref: '#/definitions/interfaces.ErrorResponse'
       summary: Calculate maximum temparature inside a region
   /region/temperature/min:
     get:
@@ -203,7 +202,7 @@ paths:
         "400":
           description: Failure response
           schema:
-            $ref: '#/definitions/interfaces.ErrorResposne'
+            $ref: '#/definitions/interfaces.ErrorResponse'
       summary: Calculate minimum temparature inside a region
   /schedule:
     post:
@@ -216,4 +215,36 @@ paths:
             type: text
       summary: Background job to sendule sensors and generate the data for given sensors
         & Also schedule the backgorund job to do the aggregations on generated data.
+  /sensor/{codeName}/temperature/average:
+    get:
+      description: Calculate average temparature by a sensor
+      operationId: calculate-avg-temparature-by-sensor
+      parameters:
+      - description: Start time in Unix timestamp
+        in: query
+        name: from
+        required: true
+        type: integer
+      - description: End time in Unix timestamp
+        in: query
+        name: till
+        required: true
+        type: integer
+      - description: Code name of the sensor
+        in: path
+        name: codeName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/valueObjects.Temparature'
+        "400":
+          description: Failure response
+          schema:
+            $ref: '#/definitions/interfaces.ErrorResponse'
+      summary: Calculates average temparature in a given time interval
 swagger: "2.0"

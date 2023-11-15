@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/srik007/sensor-api/application"
+	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/repository"
 	"github.com/srik007/sensor-api/infrastructure/cache"
 	"gorm.io/gorm"
@@ -77,7 +80,7 @@ func (s *SensorHandler) CollectSpeciesUnderGroup(c *gin.Context) {
 // @Produce json
 // @Param groupName path string true "Group name"
 // @Param topN path int true "Top n"
-// @Router /group/{groupName}/species//top/:topN [get]
+// @Router /group/{groupName}/species/top/:topN [get]
 func (s *SensorHandler) CollectTopNSpeciesUnderGroup(c *gin.Context) {
 	groupName := c.Param("groupName")
 	topNValue := c.Param("topN")
@@ -137,7 +140,7 @@ func (s *SensorHandler) CollectAverageTemparatureUnderGroup(c *gin.Context) {
 	return
 }
 
-type ErrorResposne struct {
+type ErrorResponse struct {
 	Message string
 }
 
@@ -146,7 +149,7 @@ type ErrorResposne struct {
 // @Description Calculate minimum temparature
 // @ID calculate-min-temparature
 // @Success 200 {object} valueObjects.Temparature "Successful response"
-// @Failure 400 {object} ErrorResposne "Failure response"
+// @Failure 400 {object} ErrorResponse "Failure response"
 // @Produce json
 // @Param xMin query float64 true "Minimum x"
 // @Param xMax query float64 true "Maximum x"
@@ -163,7 +166,7 @@ func (s *SensorHandler) CalculateMinTemparatureInsideARegion(c *gin.Context) {
 	zMin, _ := strconv.ParseFloat(c.Query("zMin"), 64)
 	zMax, _ := strconv.ParseFloat(c.Query("zMax"), 64)
 	if xMin >= xMax || yMin >= yMax || zMin >= zMax {
-		errorResponse := &ErrorResposne{Message: "Invalid range parameters"}
+		errorResponse := &ErrorResponse{Message: "Invalid range parameters"}
 		c.JSON(http.StatusBadRequest, errorResponse)
 		return
 	}
@@ -176,7 +179,7 @@ func (s *SensorHandler) CalculateMinTemparatureInsideARegion(c *gin.Context) {
 // @Description Calculate maximum temparature
 // @ID calculate-max-temparature
 // @Success 200 {object} valueObjects.Temparature "Successful response"
-// @Failure 400 {object} ErrorResposne "Failure response"
+// @Failure 400 {object} ErrorResponse "Failure response"
 // @Produce json
 // @Param xMin query float64 true "Minimum x"
 // @Param xMax query float64 true "Maximum x"
@@ -193,10 +196,79 @@ func (s *SensorHandler) CalculateMaxTemparatureInsideARegion(c *gin.Context) {
 	zMin, _ := strconv.ParseFloat(c.Query("zMin"), 64)
 	zMax, _ := strconv.ParseFloat(c.Query("zMax"), 64)
 	if xMin >= xMax || yMin >= yMax || zMin >= zMax {
-		errorResponse := &ErrorResposne{Message: "Invalid range parameters"}
+		errorResponse := &ErrorResponse{Message: "Invalid range parameters"}
 		c.JSON(http.StatusBadRequest, errorResponse)
 		return
 	}
 	maxTemparature := s.sensorApp.CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax)
 	c.JSON(http.StatusOK, maxTemparature)
+}
+
+type ValidationData struct {
+	CodeName  entity.CodeName
+	StartTime time.Time
+	EndTime   time.Time
+}
+
+// CalculateAverageTemparatureBySensor is a handler that calculates average temperature in a given time interval.
+// @Summary Calculates average temparature in a given time interval
+// @Description Calculate average temparature by a sensor
+// @ID calculate-avg-temparature-by-sensor
+// @Success 200 {object} valueObjects.Temparature "Successful response"
+// @Failure 400 {object} ErrorResponse "Failure response"
+// @Produce json
+// @Param from query int64 true "Start time in Unix timestamp"
+// @Param till query int64 true "End time in Unix timestamp"
+// @Param codeName path string  true "Code name of the sensor"
+// @Router /sensor/{codeName}/temperature/average [get]
+func (s *SensorHandler) CalculateAverageTemparatureBySensor(c *gin.Context) {
+	data, err := Validate(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+	}
+	avgTemparature := s.sensorApp.CalculateAverageTemparatureBySensor(data.CodeName, data.StartTime, data.EndTime)
+	c.JSON(http.StatusOK, avgTemparature)
+}
+
+func Validate(c *gin.Context) (*ValidationData, *ErrorResponse) {
+	fromTimestamp, err := strconv.ParseInt(c.Query("from"), 10, 64)
+
+	if err != nil {
+		errorResponse := &ErrorResponse{Message: "Invalid from unix timestamp"}
+		return nil, errorResponse
+	}
+
+	tillTimestamp, err := strconv.ParseInt(c.Query("till"), 10, 64)
+	if err != nil {
+		errorResponse := &ErrorResponse{Message: "Invalid till unix timestamp"}
+		return nil, errorResponse
+	}
+	startTime := time.Unix(fromTimestamp, 0)
+	endTime := time.Unix(tillTimestamp, 0)
+	if endTime.Before(startTime) {
+		errorResponse := &ErrorResponse{Message: "End time is before start time."}
+		return nil, errorResponse
+	}
+	parts := strings.Split(c.Param("codeName"), "_")
+
+	if len(parts) != 2 {
+		errorResponse := &ErrorResponse{Message: "Invalid code names"}
+		return nil, errorResponse
+	}
+
+	groupId, err := strconv.ParseUint(parts[1], 10, 64)
+
+	if err != nil {
+		errorResponse := &ErrorResponse{Message: "Invalid code name"}
+		return nil, errorResponse
+	}
+
+	return &ValidationData{
+		CodeName: entity.CodeName{
+			Name:    parts[0],
+			GroupId: groupId,
+		},
+		StartTime: startTime,
+		EndTime:   endTime,
+	}, nil
 }
