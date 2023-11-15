@@ -220,7 +220,7 @@ type ValidationData struct {
 // @Param from query int64 true "Start time in Unix timestamp"
 // @Param till query int64 true "End time in Unix timestamp"
 // @Param codeName path string  true "Code name of the sensor"
-// @Router /sensor/{codeName}/temperature/average [get]
+// @Router /sensor/{codeName}/temparature/average [get]
 func (s *SensorHandler) CalculateAverageTemparatureBySensor(c *gin.Context) {
 	data, err := Validate(c)
 	if err != nil {

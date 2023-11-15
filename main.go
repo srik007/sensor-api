@@ -72,7 +72,7 @@ func main() {
 
 		v1.GET("/region/temperature/max", sensorHandler.CalculateMaxTemparatureInsideARegion)
 
-		v1.GET("/sensor/:codeName/temperature/average", sensorHandler.CalculateAverageTemparatureBySensor)
+		v1.GET("/sensor/:codeName/temparature/average", sensorHandler.CalculateAverageTemparatureBySensor)
 
 	}
 
