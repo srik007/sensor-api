@@ -3,6 +3,8 @@ package generators
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"strconv"
 
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/repository"
@@ -29,7 +31,11 @@ var sensorGroupNames = []string{
 
 func (g *Generator) GenerateSensorMetaData() {
 	var sensors []entity.Sensor
-	numberOfSensors := 1
+	numberOfSensors, err := strconv.Atoi(os.Getenv("NUMBER_OF_SENSORS"))
+	if err != nil {
+		fmt.Println("Invalid number of sensors configured.")
+		numberOfSensors = 4
+	}
 	ocean3D := valueObjects.NewOcean3D(-90.0, 90.0, -180.0, 180.0, 0.0, 100.0)
 	for i := 0; i < numberOfSensors; i++ {
 		randomSensorGroupName := sensorGroupNames[rand.Intn(len(sensorGroupNames))]
