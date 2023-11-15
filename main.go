@@ -9,6 +9,10 @@ import (
 	"github.com/srik007/sensor-api/infrastructure/cache"
 	"github.com/srik007/sensor-api/infrastructure/persistance"
 	"github.com/srik007/sensor-api/interfaces"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/srik007/sensor-api/docs"
 )
 
 func init() {
@@ -17,6 +21,11 @@ func init() {
 	}
 }
 
+// @title Underwater Sensor API
+// @version 1.0
+// @description A Under water sensor api to monitor the sensor data and generate aggrates of the data.
+// @host localhost:8080
+// @BasePath /api/v1
 func main() {
 
 	dbdriver := os.Getenv("DB_DRIVER")
@@ -42,17 +51,24 @@ func main() {
 
 	r := gin.Default()
 
-	r.POST("/api/generate", sensorHandler.GenerateMetadata)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.POST("/api/schedule", sensorHandler.ScheduleJob)
+	v1 := r.Group("/api/v1")
+	{
 
-	r.GET("/group/:groupName/transparency", sensorHandler.CollectAverageTransparencyUnderGroup)
+		v1.POST("generate", sensorHandler.GenerateMetadata)
 
-	r.GET("/group/:groupName/temparature", sensorHandler.CollectAverageTemparatureUnderGroup)
+		v1.POST("schedule", sensorHandler.ScheduleJob)
 
-	r.GET("/group/:groupName/species", sensorHandler.CollectSpeciesUnderGroup)
+		v1.GET("/group/:groupName/transparency", sensorHandler.CollectAverageTransparencyUnderGroup)
 
-	r.GET("/group/:groupName/species/top/:topN", sensorHandler.CollectTopNSpeciesUnderGroup)
+		v1.GET("/group/:groupName/temparature", sensorHandler.CollectAverageTemparatureUnderGroup)
+
+		v1.GET("/group/:groupName/species", sensorHandler.CollectSpeciesUnderGroup)
+
+		v1.GET("/group/:groupName/species/top/:topN", sensorHandler.CollectTopNSpeciesUnderGroup)
+
+	}
 
 	app_port := os.Getenv("PORT")
 

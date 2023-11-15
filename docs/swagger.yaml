@@ -1,0 +1,113 @@
+basePath: /api/v1
+definitions:
+  entity.Specie:
+    properties:
+      count:
+        type: integer
+      name:
+        type: string
+    type: object
+  interfaces.AverageTransparencyResponse:
+    properties:
+      groupName:
+        type: string
+      transparency:
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A Under water sensor api to monitor the sensor data and generate aggrates
+    of the data.
+  title: Underwater Sensor API
+  version: "1.0"
+paths:
+  /generate:
+    post:
+      description: Generate the meta data for sensors and sensor groups
+      operationId: generate-sensor-metadata
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: text
+      summary: 'Generate the sensor metadata (code name, coordaiates, data output
+        rate) and sensor groups Ex: Gamma 3'
+  /group/{groupName}/species:
+    get:
+      description: Get total species by group name.
+      operationId: collect-total-species-under-group
+      parameters:
+      - description: Group name
+        in: path
+        name: groupName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            items:
+              $ref: '#/definitions/entity.Specie'
+            type: array
+      summary: Collect all the fish species detected under sensors belonging to a
+        given sensor group.
+  /group/{groupName}/species//top/:topN:
+    get:
+      description: Get top N species by group name.
+      operationId: collect-top-n-species-under-group
+      parameters:
+      - description: Group name
+        in: path
+        name: groupName
+        required: true
+        type: string
+      - description: Top n
+        in: path
+        name: topN
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            items:
+              $ref: '#/definitions/entity.Specie'
+            type: array
+      summary: Collect top N fish species detected under sensors belonging to a given
+        sensor group.
+  /group/{groupName}/temparature:
+    get:
+      description: Collect average temparature
+      operationId: collect-avg-temparature
+      parameters:
+      - description: Group name
+        in: path
+        name: groupName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/interfaces.AverageTransparencyResponse'
+      summary: Collect average temparature of all the sensors temparature under given
+        group
+  /schedule:
+    post:
+      description: Run background job to generate sensors data
+      operationId: schedule-jobs
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: text
+      summary: Background job to sendule sensors and generate the data for given sensors
+        & Also schedule the backgorund job to do the aggregations on generated data.
+swagger: "2.0"

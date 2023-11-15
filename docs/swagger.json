@@ -1,0 +1,161 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "A Under water sensor api to monitor the sensor data and generate aggrates of the data.",
+        "title": "Underwater Sensor API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/generate": {
+            "post": {
+                "description": "Generate the meta data for sensors and sensor groups",
+                "summary": "Generate the sensor metadata (code name, coordaiates, data output rate) and sensor groups Ex: Gamma 3",
+                "operationId": "generate-sensor-metadata",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "text"
+                        }
+                    }
+                }
+            }
+        },
+        "/group/{groupName}/species": {
+            "get": {
+                "description": "Get total species by group name.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Collect all the fish species detected under sensors belonging to a given sensor group.",
+                "operationId": "collect-total-species-under-group",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group name",
+                        "name": "groupName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Specie"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/group/{groupName}/species//top/:topN": {
+            "get": {
+                "description": "Get top N species by group name.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Collect top N fish species detected under sensors belonging to a given sensor group.",
+                "operationId": "collect-top-n-species-under-group",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group name",
+                        "name": "groupName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Top n",
+                        "name": "topN",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Specie"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/group/{groupName}/temparature": {
+            "get": {
+                "description": "Collect average temparature",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Collect average temparature of all the sensors temparature under given group",
+                "operationId": "collect-avg-temparature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group name",
+                        "name": "groupName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.AverageTransparencyResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/schedule": {
+            "post": {
+                "description": "Run background job to generate sensors data",
+                "summary": "Background job to sendule sensors and generate the data for given sensors \u0026 Also schedule the backgorund job to do the aggregations on generated data.",
+                "operationId": "schedule-jobs",
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "text"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.Specie": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "interfaces.AverageTransparencyResponse": {
+            "type": "object",
+            "properties": {
+                "groupName": {
+                    "type": "string"
+                },
+                "transparency": {
+                    "type": "number"
+                }
+            }
+        }
+    }
+}
