@@ -28,14 +28,14 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
-  # go-app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - postgres
-  #     - redis
-  #   ports:
-  #     - "${GO_APP_PORT:-8080}:8080"
-  #   env_file:
-  #     - .env
+  go-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "${GO_APP_PORT:-8080}:8080"
+    env_file:
+      - .env
