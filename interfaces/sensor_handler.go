@@ -101,7 +101,8 @@ func (s *SensorHandler) CollectAverageTransparencyUnderGroup(c *gin.Context) {
 	groupName := c.Param("groupName")
 	result := s.CacheStore.VerifyCache(c, groupName)
 	if result != nil {
-		c.JSON(http.StatusOK, gin.H{"Transparency": result.AverageTransparency, "GroupName": groupName})
+		cahcedResponse := &AverageTransparencyResponse{Transparency: result.AverageTransparency, GroupName: groupName}
+		c.JSON(http.StatusOK, cahcedResponse)
 		return
 	}
 	avgTransparency := s.sensorApp.CollectAverageTransparencyUnderGroup(groupName)
@@ -125,10 +126,12 @@ func (s *SensorHandler) CollectAverageTemparatureUnderGroup(c *gin.Context) {
 	groupName := c.Param("groupName")
 	result := s.CacheStore.VerifyCache(c, groupName)
 	if result != nil {
-		c.JSON(http.StatusOK, gin.H{"Temparature": result.AverageTransparency, "GroupName": groupName})
+		cahcedResponse := &AverageTemparatureResponse{Temparature: result.AverageTemperature, GroupName: groupName}
+		c.JSON(http.StatusOK, cahcedResponse)
 		return
 	}
 	avgTemparature := s.sensorApp.CollectAverageTemparatureUnderGroup(groupName)
 	averageTemparatureResponse := &AverageTemparatureResponse{Temparature: avgTemparature, GroupName: groupName}
 	c.JSON(http.StatusOK, averageTemparatureResponse)
+	return
 }
