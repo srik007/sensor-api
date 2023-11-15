@@ -1,4 +1,4 @@
-package generators
+package sensormetadata
 
 import (
 	"fmt"
@@ -11,13 +11,13 @@ import (
 	"github.com/srik007/sensor-api/domain/valueObjects"
 )
 
-type Generator struct {
+type MetadataCreator struct {
 	SensorRepository      repository.SensorRepository
 	SensorGroupRepository repository.SensorGroupRepository
 }
 
-func NewGenerator(s repository.SensorRepository, sg repository.SensorGroupRepository) *Generator {
-	return &Generator{
+func NewMetadataCreator(s repository.SensorRepository, sg repository.SensorGroupRepository) *MetadataCreator {
+	return &MetadataCreator{
 		SensorRepository:      s,
 		SensorGroupRepository: sg,
 	}
@@ -29,7 +29,7 @@ var sensorGroupNames = []string{
 	"Phi", "Chi", "Psi", "Omega",
 }
 
-func (g *Generator) GenerateSensorMetaData() {
+func (m *MetadataCreator) CreateSensorMetadata() {
 	var sensors []entity.Sensor
 	numberOfSensors, err := strconv.Atoi(os.Getenv("NUMBER_OF_SENSORS"))
 	if err != nil {
@@ -45,19 +45,19 @@ func (g *Generator) GenerateSensorMetaData() {
 		sensor := entity.Sensor{CodeName: codeName, Coordinate: coordiante, DataOutputRate: dataOutputRate}
 		sensors = append(sensors, sensor)
 	}
-	_, error := g.SensorRepository.SaveAll(sensors)
+	_, error := m.SensorRepository.SaveAll(sensors)
 	if error != nil {
 		fmt.Errorf("Failed to generate sensor data.")
 	}
 }
 
-func (g *Generator) GenerateSensorGroupMetaData() {
+func (m *MetadataCreator) CreateSensorGroupMetaData() {
 	var sensorGroups []entity.SensorGroup
 	for _, value := range sensorGroupNames {
 		sensorGroup := entity.SensorGroup{Name: value, SensorCount: 0}
 		sensorGroups = append(sensorGroups, sensorGroup)
 	}
-	_, error := g.SensorGroupRepository.SaveAll(sensorGroups)
+	_, error := m.SensorGroupRepository.SaveAll(sensorGroups)
 	if error != nil {
 		fmt.Errorf("Failed to generate sensor groups.")
 	}

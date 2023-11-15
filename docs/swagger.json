@@ -118,6 +118,142 @@
                 }
             }
         },
+        "/region/temperature/max": {
+            "get": {
+                "description": "Calculate maximum temparature",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Calculate maximum temparature inside a region",
+                "operationId": "calculate-max-temparature",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "Minimum x",
+                        "name": "xMin",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum x",
+                        "name": "xMax",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum y",
+                        "name": "yMin",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum y",
+                        "name": "yMax",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum z",
+                        "name": "zMin",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum z",
+                        "name": "zMax",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/valueObjects.Temparature"
+                        }
+                    },
+                    "400": {
+                        "description": "Failure response",
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.ErrorResposne"
+                        }
+                    }
+                }
+            }
+        },
+        "/region/temperature/min": {
+            "get": {
+                "description": "Calculate minimum temparature",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Calculate minimum temparature inside a region",
+                "operationId": "calculate-min-temparature",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "Minimum x",
+                        "name": "xMin",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum x",
+                        "name": "xMax",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum y",
+                        "name": "yMin",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum y",
+                        "name": "yMax",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum z",
+                        "name": "zMin",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum z",
+                        "name": "zMax",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/valueObjects.Temparature"
+                        }
+                    },
+                    "400": {
+                        "description": "Failure response",
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.ErrorResposne"
+                        }
+                    }
+                }
+            }
+        },
         "/schedule": {
             "post": {
                 "description": "Run background job to generate sensors data",
@@ -153,6 +289,25 @@
                     "type": "string"
                 },
                 "transparency": {
+                    "type": "number"
+                }
+            }
+        },
+        "interfaces.ErrorResposne": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "valueObjects.Temparature": {
+            "type": "object",
+            "properties": {
+                "scale": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "number"
                 }
             }

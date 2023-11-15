@@ -34,14 +34,15 @@ func NewSensorHandler(s repository.SensorRepository, sg repository.SensorGroupRe
 	}
 }
 
-// @Summary Generate the sensor metadata (code name, coordaiates, data output rate) and sensor groups Ex: Gamma 3
-// @Description Generate the meta data for sensors and sensor groups
-// @ID generate-sensor-metadata
-// @Success 200 {text} Data generated successfully.
-// @Router /generate [post]
-func (s *SensorHandler) GenerateMetadata(c *gin.Context) {
-	s.sensorApp.GenerateMetadata()
-	c.JSON(http.StatusOK, "Data generated successfully.")
+// CreateMetadata is a handler that creates metada for sensors & sensors groups
+// @Summary Create sensor metadata and sensor group metadata
+// @Description Create the meta data for sensors and sensor groups
+// @ID create-sensor-metadata
+// @Success 200 {text} Sensor metadata created successfully.
+// @Router /createMetadata [post]
+func (s *SensorHandler) CreateMetadata(c *gin.Context) {
+	s.sensorApp.CreateMetadata()
+	c.JSON(http.StatusOK, "Sensor metadata created successfully.")
 }
 
 // @Summary Background job to sendule sensors and generate the data for given sensors & Also schedule the backgorund job to do the aggregations on generated data.
@@ -134,4 +135,68 @@ func (s *SensorHandler) CollectAverageTemparatureUnderGroup(c *gin.Context) {
 	averageTemparatureResponse := &AverageTemparatureResponse{Temparature: avgTemparature, GroupName: groupName}
 	c.JSON(http.StatusOK, averageTemparatureResponse)
 	return
+}
+
+type ErrorResposne struct {
+	Message string
+}
+
+// CalculateMinTemparatureInsideARegion is a handler that calculates min temparature in a given region.
+// @Summary Calculate minimum temparature inside a region
+// @Description Calculate minimum temparature
+// @ID calculate-min-temparature
+// @Success 200 {object} valueObjects.Temparature "Successful response"
+// @Failure 400 {object} ErrorResposne "Failure response"
+// @Produce json
+// @Param xMin query float64 true "Minimum x"
+// @Param xMax query float64 true "Maximum x"
+// @Param yMin query float64 true "Minimum y"
+// @Param yMax query float64 true "Maximum y"
+// @Param zMin query float64 true "Minimum z"
+// @Param zMax query float64 true "Maximum z"
+// @Router /region/temperature/min [get]
+func (s *SensorHandler) CalculateMinTemparatureInsideARegion(c *gin.Context) {
+	xMin, _ := strconv.ParseFloat(c.Query("xMin"), 64)
+	xMax, _ := strconv.ParseFloat(c.Query("xMax"), 64)
+	yMin, _ := strconv.ParseFloat(c.Query("yMin"), 64)
+	yMax, _ := strconv.ParseFloat(c.Query("yMax"), 64)
+	zMin, _ := strconv.ParseFloat(c.Query("zMin"), 64)
+	zMax, _ := strconv.ParseFloat(c.Query("zMax"), 64)
+	if xMin >= xMax || yMin >= yMax || zMin >= zMax {
+		errorResponse := &ErrorResposne{Message: "Invalid range parameters"}
+		c.JSON(http.StatusBadRequest, errorResponse)
+		return
+	}
+	minTemperature := s.sensorApp.CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax)
+	c.JSON(http.StatusOK, minTemperature)
+}
+
+// CalculateMaxTemparatureInsideARegion is a handler that calculates max temparature in a given region.
+// @Summary Calculate maximum temparature inside a region
+// @Description Calculate maximum temparature
+// @ID calculate-max-temparature
+// @Success 200 {object} valueObjects.Temparature "Successful response"
+// @Failure 400 {object} ErrorResposne "Failure response"
+// @Produce json
+// @Param xMin query float64 true "Minimum x"
+// @Param xMax query float64 true "Maximum x"
+// @Param yMin query float64 true "Minimum y"
+// @Param yMax query float64 true "Maximum y"
+// @Param zMin query float64 true "Minimum z"
+// @Param zMax query float64 true "Maximum z"
+// @Router /region/temperature/max [get]
+func (s *SensorHandler) CalculateMaxTemparatureInsideARegion(c *gin.Context) {
+	xMin, _ := strconv.ParseFloat(c.Query("xMin"), 64)
+	xMax, _ := strconv.ParseFloat(c.Query("xMax"), 64)
+	yMin, _ := strconv.ParseFloat(c.Query("yMin"), 64)
+	yMax, _ := strconv.ParseFloat(c.Query("yMax"), 64)
+	zMin, _ := strconv.ParseFloat(c.Query("zMin"), 64)
+	zMax, _ := strconv.ParseFloat(c.Query("zMax"), 64)
+	if xMin >= xMax || yMin >= yMax || zMin >= zMax {
+		errorResponse := &ErrorResposne{Message: "Invalid range parameters"}
+		c.JSON(http.StatusBadRequest, errorResponse)
+		return
+	}
+	maxTemparature := s.sensorApp.CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax)
+	c.JSON(http.StatusOK, maxTemparature)
 }

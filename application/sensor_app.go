@@ -4,15 +4,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/srik007/sensor-api/aggregators"
 	"github.com/srik007/sensor-api/domain/entity"
-	"github.com/srik007/sensor-api/domain/generators"
 	"github.com/srik007/sensor-api/domain/repository"
 	scheduler "github.com/srik007/sensor-api/domain/schedulers"
+	sensormetadata "github.com/srik007/sensor-api/domain/sensor_metadata"
+	"github.com/srik007/sensor-api/domain/valueObjects"
 	"github.com/srik007/sensor-api/infrastructure/cache"
 	"gorm.io/gorm"
 )
 
 type SensorApp struct {
-	Generator             generators.Generator
+	MetadataCreator       sensormetadata.MetadataCreator
 	Scheduler             scheduler.SchedulerJob
 	AggregateQueryHandler aggregators.AggregatorQueryHandler
 	AggregateScheduler    aggregators.AggregatorSchedulerJob
@@ -20,7 +21,7 @@ type SensorApp struct {
 
 func NewSensorApp(s repository.SensorRepository, sg repository.SensorGroupRepository, dataStore *gorm.DB, cache *cache.RedisCache) *SensorApp {
 	return &SensorApp{
-		Generator:             *generators.NewGenerator(s, sg),
+		MetadataCreator:       *sensormetadata.NewMetadataCreator(s, sg),
 		Scheduler:             *scheduler.NewScheduler(s),
 		AggregateScheduler:    *aggregators.NewScheduler(cache),
 		AggregateQueryHandler: *aggregators.NewAggregatorQueryHandler(dataStore),
@@ -28,19 +29,21 @@ func NewSensorApp(s repository.SensorRepository, sg repository.SensorGroupReposi
 }
 
 type SensorAppInterface interface {
-	GenerateMetadata()
+	CreateMetadata()
 	Schedule(c *gin.Context)
 	CollectSpeciesUnderGroup(groupName string) entity.Species
 	CollectTopNSpeciesUnderGroup(groupName string, topN int) entity.Species
 	CollectAverageTransparencyUnderGroup(groupName string) float64
 	CollectAverageTemparatureUnderGroup(groupName string) float64
+	CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature
+	CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature
 }
 
 var _ SensorAppInterface = &SensorApp{}
 
-func (s *SensorApp) GenerateMetadata() {
-	s.Generator.GenerateSensorMetaData()
-	s.Generator.GenerateSensorGroupMetaData()
+func (s *SensorApp) CreateMetadata() {
+	s.MetadataCreator.CreateSensorMetadata()
+	s.MetadataCreator.CreateSensorGroupMetaData()
 }
 
 func (s *SensorApp) Schedule(c *gin.Context) {
@@ -62,4 +65,12 @@ func (s *SensorApp) CollectAverageTransparencyUnderGroup(groupName string) float
 
 func (s *SensorApp) CollectAverageTemparatureUnderGroup(groupName string) float64 {
 	return s.AggregateQueryHandler.CollectGroupAggregatorsByName(groupName).AverageTemperature
+}
+
+func (s *SensorApp) CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature {
+	return s.AggregateQueryHandler.CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax)
+}
+
+func (s *SensorApp) CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature {
+	return s.AggregateQueryHandler.CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax)
 }

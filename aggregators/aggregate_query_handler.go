@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/srik007/sensor-api/domain/entity"
+	"github.com/srik007/sensor-api/domain/valueObjects"
 	"gorm.io/gorm"
 )
 
@@ -85,4 +86,30 @@ func (a *AggregatorQueryHandler) CollectSpeciesUnderGroup(groupName string) enti
 		uniqueSpecies = append(uniqueSpecies, newSpecie...)
 	}
 	return uniqueSpecies
+}
+
+func (a *AggregatorQueryHandler) CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature {
+
+	var minTemparature valueObjects.Temparature
+
+	a.DataStore.Model(&entity.SensorData{}).
+		Joins("JOIN sensors ON sensor_data.sensor_id = sensors.id").
+		Select("MIN(sensor_data.value) as value").
+		Where("sensors.x BETWEEN ? AND ? AND sensors.y BETWEEN ? AND ? AND sensors.z BETWEEN ? AND ?", xMin, xMax, yMin, yMax, zMin, zMax).
+		Scan(&minTemparature)
+	minTemparature.Scale = "Celsius"
+	return minTemparature
+}
+
+func (a *AggregatorQueryHandler) CalculateMaxTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature {
+
+	var maxTemparature valueObjects.Temparature
+
+	a.DataStore.Model(&entity.SensorData{}).
+		Joins("JOIN sensors ON sensor_data.sensor_id = sensors.id").
+		Select("MAX(sensor_data.value) as value").
+		Where("sensors.x BETWEEN ? AND ? AND sensors.y BETWEEN ? AND ? AND sensors.z BETWEEN ? AND ?", xMin, xMax, yMin, yMax, zMin, zMax).
+		Scan(&maxTemparature)
+	maxTemparature.Scale = "Celsius"
+	return maxTemparature
 }

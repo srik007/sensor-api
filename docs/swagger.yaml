@@ -14,6 +14,18 @@ definitions:
       transparency:
         type: number
     type: object
+  interfaces.ErrorResposne:
+    properties:
+      message:
+        type: string
+    type: object
+  valueObjects.Temparature:
+    properties:
+      scale:
+        type: string
+      value:
+        type: number
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -99,6 +111,100 @@ paths:
             $ref: '#/definitions/interfaces.AverageTransparencyResponse'
       summary: Collect average temparature of all the sensors temparature under given
         group
+  /region/temperature/max:
+    get:
+      description: Calculate maximum temparature
+      operationId: calculate-max-temparature
+      parameters:
+      - description: Minimum x
+        in: query
+        name: xMin
+        required: true
+        type: number
+      - description: Maximum x
+        in: query
+        name: xMax
+        required: true
+        type: number
+      - description: Minimum y
+        in: query
+        name: yMin
+        required: true
+        type: number
+      - description: Maximum y
+        in: query
+        name: yMax
+        required: true
+        type: number
+      - description: Minimum z
+        in: query
+        name: zMin
+        required: true
+        type: number
+      - description: Maximum z
+        in: query
+        name: zMax
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/valueObjects.Temparature'
+        "400":
+          description: Failure response
+          schema:
+            $ref: '#/definitions/interfaces.ErrorResposne'
+      summary: Calculate maximum temparature inside a region
+  /region/temperature/min:
+    get:
+      description: Calculate minimum temparature
+      operationId: calculate-min-temparature
+      parameters:
+      - description: Minimum x
+        in: query
+        name: xMin
+        required: true
+        type: number
+      - description: Maximum x
+        in: query
+        name: xMax
+        required: true
+        type: number
+      - description: Minimum y
+        in: query
+        name: yMin
+        required: true
+        type: number
+      - description: Maximum y
+        in: query
+        name: yMax
+        required: true
+        type: number
+      - description: Minimum z
+        in: query
+        name: zMin
+        required: true
+        type: number
+      - description: Maximum z
+        in: query
+        name: zMax
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/valueObjects.Temparature'
+        "400":
+          description: Failure response
+          schema:
+            $ref: '#/definitions/interfaces.ErrorResposne'
+      summary: Calculate minimum temparature inside a region
   /schedule:
     post:
       description: Run background job to generate sensors data

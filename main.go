@@ -56,7 +56,7 @@ func main() {
 	v1 := r.Group("/api/v1")
 	{
 
-		v1.POST("generate", sensorHandler.GenerateMetadata)
+		v1.POST("create-metadata", sensorHandler.CreateMetadata)
 
 		v1.POST("schedule", sensorHandler.ScheduleJob)
 
@@ -67,6 +67,10 @@ func main() {
 		v1.GET("/group/:groupName/species", sensorHandler.CollectSpeciesUnderGroup)
 
 		v1.GET("/group/:groupName/species/top/:topN", sensorHandler.CollectTopNSpeciesUnderGroup)
+
+		v1.GET("/region/temperature/min", sensorHandler.CalculateMinTemparatureInsideARegion)
+
+		v1.GET("/region/temperature/max", sensorHandler.CalculateMaxTemparatureInsideARegion)
 
 	}
 
