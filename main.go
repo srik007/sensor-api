@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/srik007/sensor-api/infrastructure/cache"
 	"github.com/srik007/sensor-api/infrastructure/persistance"
 	"github.com/srik007/sensor-api/interfaces"
 )
@@ -24,8 +25,10 @@ func main() {
 	user := os.Getenv("DB_USER")
 	dbname := os.Getenv("DB_NAME")
 	port := os.Getenv("DB_PORT")
+	cacheUrl := os.Getenv("REDIS_URL")
 
 	services, err := persistance.NewRepositories(dbdriver, user, password, port, host, dbname)
+	cahce := cache.NewCache(cacheUrl)
 
 	if err != nil {
 		panic(err)
@@ -35,13 +38,17 @@ func main() {
 
 	services.Automigrate()
 
-	sensorHandler := interfaces.NewSensorHandler(services.SensorRepository, services.SensorGroupRepository, services.DataStore)
+	sensorHandler := interfaces.NewSensorHandler(services.SensorRepository, services.SensorGroupRepository, services.DataStore, cahce)
 
 	r := gin.Default()
 
 	r.POST("/api/generate", sensorHandler.GenerateMetadata)
 
 	r.POST("/api/schedule", sensorHandler.ScheduleJob)
+
+	r.GET("/group/:groupName/transparency", sensorHandler.CollectAverageTransparencyUnderGroup)
+
+	r.GET("/group/:groupName/temparature", sensorHandler.CollectAverageTemparatureUnderGroup)
 
 	r.GET("/group/:groupName/species", sensorHandler.CollectSpeciesUnderGroup)
 

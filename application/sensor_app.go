@@ -1,33 +1,39 @@
 package application
 
 import (
-	"github.com/srik007/sensor-api/domain/aggregators"
+	"github.com/gin-gonic/gin"
+	"github.com/srik007/sensor-api/aggregators"
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/generators"
 	"github.com/srik007/sensor-api/domain/repository"
 	scheduler "github.com/srik007/sensor-api/domain/schedulers"
+	"github.com/srik007/sensor-api/infrastructure/cache"
 	"gorm.io/gorm"
 )
 
 type SensorApp struct {
-	Generator  generators.Generator
-	Scheduler  scheduler.SchedulerJob
-	Aggregator aggregators.Aggregator
+	Generator             generators.Generator
+	Scheduler             scheduler.SchedulerJob
+	AggregateQueryHandler aggregators.AggregatorQueryHandler
+	AggregateScheduler    aggregators.AggregatorSchedulerJob
 }
 
-func NewSensorApp(s repository.SensorRepository, sg repository.SensorGroupRepository, dataStore *gorm.DB) *SensorApp {
+func NewSensorApp(s repository.SensorRepository, sg repository.SensorGroupRepository, dataStore *gorm.DB, cache *cache.RedisCache) *SensorApp {
 	return &SensorApp{
-		Generator:  *generators.NewGenerator(s, sg),
-		Scheduler:  *scheduler.NewJob(s),
-		Aggregator: *aggregators.NewAggregator(dataStore),
+		Generator:             *generators.NewGenerator(s, sg),
+		Scheduler:             *scheduler.NewScheduler(s),
+		AggregateScheduler:    *aggregators.NewScheduler(cache),
+		AggregateQueryHandler: *aggregators.NewAggregatorQueryHandler(dataStore),
 	}
 }
 
 type SensorAppInterface interface {
 	GenerateMetadata()
-	ScheduleJob()
+	Schedule(c *gin.Context)
 	CollectSpeciesUnderGroup(groupName string) entity.Species
 	CollectTopNSpeciesUnderGroup(groupName string, topN int) entity.Species
+	CollectAverageTransparencyUnderGroup(groupName string) float64
+	CollectAverageTemparatureUnderGroup(groupName string) float64
 }
 
 var _ SensorAppInterface = &SensorApp{}
@@ -37,15 +43,23 @@ func (s *SensorApp) GenerateMetadata() {
 	s.Generator.GenerateSensorGroupMetaData()
 }
 
-func (s *SensorApp) ScheduleJob() {
+func (s *SensorApp) Schedule(c *gin.Context) {
 	s.Scheduler.Run()
-	s.Aggregator.Run()
+	s.AggregateScheduler.Run(c, s.AggregateQueryHandler)
 }
 
 func (s *SensorApp) CollectSpeciesUnderGroup(groupName string) entity.Species {
-	return s.Aggregator.CollectSpeciesUnderGroup(groupName)
+	return s.AggregateQueryHandler.CollectSpeciesUnderGroup(groupName)
 }
 
 func (s *SensorApp) CollectTopNSpeciesUnderGroup(groupName string, topN int) entity.Species {
-	return s.Aggregator.CollectTopNSpeciesUnderGroup(groupName, topN)
+	return s.AggregateQueryHandler.CollectTopNSpeciesUnderGroup(groupName, topN)
+}
+
+func (s *SensorApp) CollectAverageTransparencyUnderGroup(groupName string) float64 {
+	return s.AggregateQueryHandler.CollectGroupAggregatorsByName(groupName).AverageTransparency
+}
+
+func (s *SensorApp) CollectAverageTemparatureUnderGroup(groupName string) float64 {
+	return s.AggregateQueryHandler.CollectGroupAggregatorsByName(groupName).AverageTemperature
 }

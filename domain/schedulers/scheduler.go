@@ -13,7 +13,7 @@ type SchedulerJob struct {
 	Channles         map[int]chan entity.SensorData
 }
 
-func NewJob(s repository.SensorRepository) *SchedulerJob {
+func NewScheduler(s repository.SensorRepository) *SchedulerJob {
 	return &SchedulerJob{SensorRepository: s, Channles: make(map[int]chan entity.SensorData)}
 }
 
