@@ -1,5 +1,23 @@
 basePath: /api/v1
 definitions:
+  entity.CodeName:
+    properties:
+      groupId:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.Sensor:
+    properties:
+      codeName:
+        $ref: '#/definitions/entity.CodeName'
+      coordinate:
+        $ref: '#/definitions/valueObjects.Coordinate'
+      dataOutputRate:
+        $ref: '#/definitions/valueObjects.DataOuputRate'
+      id:
+        type: integer
+    type: object
   entity.Specie:
     properties:
       count:
@@ -18,6 +36,18 @@ definitions:
     properties:
       message:
         type: string
+    type: object
+  valueObjects.Coordinate:
+    properties:
+      x:
+        type: number
+    type: object
+  valueObjects.DataOuputRate:
+    properties:
+      format:
+        type: string
+      value:
+        type: integer
     type: object
   valueObjects.Temparature:
     properties:
@@ -40,9 +70,11 @@ paths:
       operationId: create-sensor-metadata
       responses:
         "200":
-          description: OK
+          description: Successfully response
           schema:
-            type: text
+            items:
+              $ref: '#/definitions/entity.Sensor'
+            type: array
       summary: Create sensor metadata and sensor group metadata
   /group/{groupName}/species:
     get:
@@ -65,7 +97,7 @@ paths:
             type: array
       summary: Collect all the fish species detected under sensors belonging to a
         given sensor group.
-  /group/{groupName}/species//top/:topN:
+  /group/{groupName}/species/top/:topN:
     get:
       description: Get top N species by group name.
       operationId: collect-top-n-species-under-group
@@ -79,6 +111,14 @@ paths:
         in: path
         name: topN
         required: true
+        type: integer
+      - description: Start time in Unix timestamp
+        in: query
+        name: from
+        type: integer
+      - description: End time in Unix timestamp
+        in: query
+        name: till
         type: integer
       produces:
       - application/json
@@ -110,7 +150,7 @@ paths:
             $ref: '#/definitions/interfaces.AverageTransparencyResponse'
       summary: Collect average temparature of all the sensors temparature under given
         group
-  /region/temperature/max:
+  /region/temparature/max:
     get:
       description: Calculate maximum temparature
       operationId: calculate-max-temparature
@@ -157,7 +197,7 @@ paths:
           schema:
             $ref: '#/definitions/interfaces.ErrorResponse'
       summary: Calculate maximum temparature inside a region
-  /region/temperature/min:
+  /region/temparature/min:
     get:
       description: Calculate minimum temparature
       operationId: calculate-min-temparature
@@ -215,7 +255,7 @@ paths:
             type: text
       summary: Background job to sendule sensors and generate the data for given sensors
         & Also schedule the backgorund job to do the aggregations on generated data.
-  /sensor/{codeName}/temperature/average:
+  /sensor/{codeName}/temparature/average:
     get:
       description: Calculate average temparature by a sensor
       operationId: calculate-avg-temparature-by-sensor

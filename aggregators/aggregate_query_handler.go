@@ -2,7 +2,6 @@ package aggregators
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 	"time"
 
@@ -71,6 +70,17 @@ func (a *AggregatorQueryHandler) CollectTopNSpeciesUnderGroup(groupName string, 
 	return uniqueSpecies
 }
 
+func (a *AggregatorQueryHandler) CollectTopNSpeciesUnderGroupBetween(groupName string, top int, startTime, endTime time.Time) entity.Species {
+	uniqueSpecies := a.CollectSpeciesUnderGroupBetween(groupName, startTime, endTime)
+	sort.Slice(uniqueSpecies, func(i, j int) bool {
+		return uniqueSpecies[i].Count > uniqueSpecies[j].Count
+	})
+	if len(uniqueSpecies) > top {
+		uniqueSpecies = uniqueSpecies[:top]
+	}
+	return uniqueSpecies
+}
+
 func (a *AggregatorQueryHandler) CollectSpeciesUnderGroup(groupName string) entity.Species {
 	var species []string
 	var uniqueSpecies entity.Species
@@ -80,7 +90,23 @@ func (a *AggregatorQueryHandler) CollectSpeciesUnderGroup(groupName string) enti
 		Where("sensor_groups.name = ?", groupName).
 		Select("DISTINCT sensor_data.species").
 		Pluck("species", &species)
-	fmt.Println(species)
+	for _, specie := range species {
+		var newSpecie entity.Species
+		json.Unmarshal([]byte(specie), &newSpecie)
+		uniqueSpecies = append(uniqueSpecies, newSpecie...)
+	}
+	return uniqueSpecies
+}
+
+func (a *AggregatorQueryHandler) CollectSpeciesUnderGroupBetween(groupName string, startTime, endTime time.Time) entity.Species {
+	var species []string
+	var uniqueSpecies entity.Species
+	a.DataStore.Model(&entity.SensorData{}).
+		Joins("JOIN sensors ON sensor_data.sensor_id = sensors.id").
+		Joins("JOIN sensor_groups ON sensors.name = sensor_groups.name").
+		Where("sensor_groups.name = ? AND sensor_data.created_at BETWEEN ? AND ?", groupName, startTime, endTime).
+		Select("DISTINCT sensor_data.species").
+		Pluck("species", &species)
 	for _, specie := range species {
 		var newSpecie entity.Species
 		json.Unmarshal([]byte(specie), &newSpecie)

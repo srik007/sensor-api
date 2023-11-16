@@ -35,6 +35,7 @@ type SensorAppInterface interface {
 	Schedule(c *gin.Context)
 	CollectSpeciesUnderGroup(groupName string) entity.Species
 	CollectTopNSpeciesUnderGroup(groupName string, topN int) entity.Species
+	CollectTopNSpeciesUnderGroupBetween(groupName string, topN int, startTime, endTime time.Time) entity.Species
 	CollectAverageTransparencyUnderGroup(groupName string) float64
 	CollectAverageTemparatureUnderGroup(groupName string) float64
 	CalculateMinTemparatureInsideARegion(xMin, xMax, yMin, yMax, zMin, zMax float64) valueObjects.Temparature
@@ -61,6 +62,10 @@ func (s *SensorApp) CollectSpeciesUnderGroup(groupName string) entity.Species {
 
 func (s *SensorApp) CollectTopNSpeciesUnderGroup(groupName string, topN int) entity.Species {
 	return s.AggregateQueryHandler.CollectTopNSpeciesUnderGroup(groupName, topN)
+}
+
+func (s *SensorApp) CollectTopNSpeciesUnderGroupBetween(groupName string, topN int, startTime, endTime time.Time) entity.Species {
+	return s.AggregateQueryHandler.CollectTopNSpeciesUnderGroupBetween(groupName, topN, startTime, endTime)
 }
 
 func (s *SensorApp) CollectAverageTransparencyUnderGroup(groupName string) float64 {

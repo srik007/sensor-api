@@ -83,6 +83,22 @@ func TestTopNSpeciesInTheGroup(t *testing.T) {
 	assert.Equal(t, 10, species[0].Count)
 }
 
+func TestTopNSpeciesInTheGroupBetween(t *testing.T) {
+	var species entity.Species
+	response, err := http.Get(BASE_URL + "/group/Group2/species/top/2?from=1700137279&till=1700137279")
+	body, err := io.ReadAll(response.Body)
+	err = json.Unmarshal(body, &species)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return
+	}
+	assert.NoError(t, err)
+	defer response.Body.Close()
+
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, len(species), 0)
+}
+
 func TestMaxTemparatureInsideAGroup(t *testing.T) {
 	var maxTemparature valueObjects.Temparature
 	response, err := http.Get(BASE_URL + "/region/temparature/max?xMin=0&xMax=20&yMin=0&yMax=25&zMin=0&zMax=150")

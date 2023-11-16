@@ -22,9 +22,12 @@ const docTemplate = `{
                 "operationId": "create-sensor-metadata",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully response",
                         "schema": {
-                            "type": "text"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Sensor"
+                            }
                         }
                     }
                 }
@@ -60,7 +63,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/group/{groupName}/species//top/:topN": {
+        "/group/{groupName}/species/top/:topN": {
             "get": {
                 "description": "Get top N species by group name.",
                 "produces": [
@@ -82,6 +85,18 @@ const docTemplate = `{
                         "name": "topN",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Start time in Unix timestamp",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "End time in Unix timestamp",
+                        "name": "till",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -124,7 +139,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/region/temperature/max": {
+        "/region/temparature/max": {
             "get": {
                 "description": "Calculate maximum temparature",
                 "produces": [
@@ -192,7 +207,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/region/temperature/min": {
+        "/region/temparature/min": {
             "get": {
                 "description": "Calculate minimum temparature",
                 "produces": [
@@ -275,7 +290,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/sensor/{codeName}/temperature/average": {
+        "/sensor/{codeName}/temparature/average": {
             "get": {
                 "description": "Calculate average temparature by a sensor",
                 "produces": [
@@ -324,6 +339,34 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.CodeName": {
+            "type": "object",
+            "properties": {
+                "groupId": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Sensor": {
+            "type": "object",
+            "properties": {
+                "codeName": {
+                    "$ref": "#/definitions/entity.CodeName"
+                },
+                "coordinate": {
+                    "$ref": "#/definitions/valueObjects.Coordinate"
+                },
+                "dataOutputRate": {
+                    "$ref": "#/definitions/valueObjects.DataOuputRate"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "entity.Specie": {
             "type": "object",
             "properties": {
@@ -351,6 +394,25 @@ const docTemplate = `{
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "valueObjects.Coordinate": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "number"
+                }
+            }
+        },
+        "valueObjects.DataOuputRate": {
+            "type": "object",
+            "properties": {
+                "format": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "integer"
                 }
             }
         },

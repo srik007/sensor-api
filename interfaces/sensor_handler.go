@@ -80,6 +80,8 @@ func (s *SensorHandler) CollectSpeciesUnderGroup(c *gin.Context) {
 // @Produce json
 // @Param groupName path string true "Group name"
 // @Param topN path int true "Top n"
+// @Param from query int64 false "Start time in Unix timestamp"
+// @Param till query int64 false "End time in Unix timestamp"
 // @Router /group/{groupName}/species/top/:topN [get]
 func (s *SensorHandler) CollectTopNSpeciesUnderGroup(c *gin.Context) {
 	groupName := c.Param("groupName")
@@ -89,6 +91,13 @@ func (s *SensorHandler) CollectTopNSpeciesUnderGroup(c *gin.Context) {
 		fmt.Println("Invalid number:", err)
 		c.JSON(http.StatusBadRequest, "Wrong topN number")
 	}
+	validateTimeStampResult, _ := ValidateTimeStamp(c)
+	if validateTimeStampResult != nil {
+		species := s.sensorApp.CollectTopNSpeciesUnderGroupBetween(groupName, topN, validateTimeStampResult.StartTime, validateTimeStampResult.EndTime)
+		c.JSON(http.StatusOK, species)
+		return
+	}
+
 	species := s.sensorApp.CollectTopNSpeciesUnderGroup(groupName, topN)
 	c.JSON(http.StatusOK, species)
 }
@@ -231,24 +240,13 @@ func (s *SensorHandler) CalculateAverageTemparatureBySensor(c *gin.Context) {
 }
 
 func Validate(c *gin.Context) (*ValidationData, *ErrorResponse) {
-	fromTimestamp, err := strconv.ParseInt(c.Query("from"), 10, 64)
 
-	if err != nil {
-		errorResponse := &ErrorResponse{Message: "Invalid from unix timestamp"}
-		return nil, errorResponse
+	validationTimeStampResult, errResponse := ValidateTimeStamp(c)
+
+	if errResponse != nil {
+		return nil, errResponse
 	}
 
-	tillTimestamp, err := strconv.ParseInt(c.Query("till"), 10, 64)
-	if err != nil {
-		errorResponse := &ErrorResponse{Message: "Invalid till unix timestamp"}
-		return nil, errorResponse
-	}
-	startTime := time.Unix(fromTimestamp, 0)
-	endTime := time.Unix(tillTimestamp, 0)
-	if endTime.Before(startTime) {
-		errorResponse := &ErrorResponse{Message: "End time is before start time."}
-		return nil, errorResponse
-	}
 	parts := strings.Split(c.Param("codeName"), "_")
 
 	if len(parts) != 2 {
@@ -268,7 +266,34 @@ func Validate(c *gin.Context) (*ValidationData, *ErrorResponse) {
 			Name:    parts[0],
 			GroupId: groupId,
 		},
-		StartTime: startTime,
-		EndTime:   endTime,
+		StartTime: validationTimeStampResult.StartTime,
+		EndTime:   validationTimeStampResult.EndTime,
 	}, nil
+}
+
+type ValidateTimeStampResult struct {
+	StartTime time.Time
+	EndTime   time.Time
+}
+
+func ValidateTimeStamp(c *gin.Context) (*ValidateTimeStampResult, *ErrorResponse) {
+	fromTimestamp, err := strconv.ParseInt(c.Query("from"), 10, 64)
+
+	if err != nil {
+		errorResponse := &ErrorResponse{Message: "Invalid from unix timestamp"}
+		return nil, errorResponse
+	}
+
+	tillTimestamp, err := strconv.ParseInt(c.Query("till"), 10, 64)
+	if err != nil {
+		errorResponse := &ErrorResponse{Message: "Invalid till unix timestamp"}
+		return nil, errorResponse
+	}
+	startTime := time.Unix(fromTimestamp, 0)
+	endTime := time.Unix(tillTimestamp, 0)
+	if endTime.Before(startTime) {
+		errorResponse := &ErrorResponse{Message: "End time is before start time."}
+		return nil, errorResponse
+	}
+	return &ValidateTimeStampResult{StartTime: startTime, EndTime: endTime}, nil
 }
