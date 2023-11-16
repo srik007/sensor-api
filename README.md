@@ -33,12 +33,12 @@ Before you begin, ensure you have the following installed:
 2. **Rename `env.example` to  `.env` file in the project root and configure the data:**
 
     ```dotenv
-    PP_ENV=local
+    APP_ENV=local
     DB_HOST=postgres
     DB_DRIVER=postgres
     DB_USER=postgres
     DB_PASSWORD=postgres
-    DB_NAME=postgres
+    DB_NAME=testdb
     DB_PORT=5432
     PORT=8080
     REDIS_URL=redis:6379
