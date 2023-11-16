@@ -68,7 +68,7 @@ Swagger documentation is available at http://localhost:8080/swagger/index.html
 1. Use docker-compose.test.yml to spin up the containers
 
     ```bash
-    docker-compose -f docker-compose.test.yml up
+    docker-compose -f docker-compose.test.yml up -d
     ```
 2. Run the tests
 
