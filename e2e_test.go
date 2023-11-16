@@ -103,7 +103,6 @@ func TestMaxTemparatureInsideAGroup(t *testing.T) {
 	var maxTemparature valueObjects.Temparature
 	response, err := http.Get(BASE_URL + "/region/temparature/max?xMin=0&xMax=20&yMin=0&yMax=25&zMin=0&zMax=150")
 	body, err := io.ReadAll(response.Body)
-	fmt.Println(body)
 	err = json.Unmarshal(body, &maxTemparature)
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
@@ -111,7 +110,6 @@ func TestMaxTemparatureInsideAGroup(t *testing.T) {
 	}
 	assert.NoError(t, err)
 	defer response.Body.Close()
-	fmt.Println(maxTemparature)
 	assert.Equal(t, http.StatusOK, response.StatusCode)
 	assert.Equal(t, float64(300), maxTemparature.Value)
 	assert.Equal(t, "Celsius", maxTemparature.Scale)
@@ -121,7 +119,6 @@ func TestMinTemparatureInsideAGroup(t *testing.T) {
 	var minTemperature valueObjects.Temparature
 	response, err := http.Get(BASE_URL + "/region/temparature/min?xMin=0&xMax=20&yMin=0&yMax=25&zMin=0&zMax=150")
 	body, err := io.ReadAll(response.Body)
-	fmt.Println(body)
 	err = json.Unmarshal(body, &minTemperature)
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
@@ -140,7 +137,6 @@ func TestAverageTemparatureDetectedBySensor(t *testing.T) {
 	currentTimestamp := int64(time.Now().Unix())
 	response, err := http.Get(BASE_URL + "/sensor/Group1_1/temparature/average?from=1697438904&till=" + strconv.FormatInt(currentTimestamp, 10))
 	body, err := io.ReadAll(response.Body)
-	fmt.Println(body)
 	err = json.Unmarshal(body, &averageTemparature)
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
