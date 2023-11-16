@@ -40,6 +40,6 @@ func (r *RedisCache) VerifyCache(c *gin.Context, groupName string) *AggregatedRe
 }
 
 func (r *RedisCache) Set(c *gin.Context, k string, v string) {
-	r.Client.Set(c, k, v, 100*time.Second)
+	r.Client.Set(c, k, v, 10*time.Second)
 
 }
