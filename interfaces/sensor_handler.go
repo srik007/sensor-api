@@ -240,27 +240,20 @@ func (s *SensorHandler) CalculateAverageTemparatureBySensor(c *gin.Context) {
 }
 
 func Validate(c *gin.Context) (*ValidationData, *ErrorResponse) {
-
 	validationTimeStampResult, errResponse := ValidateTimeStamp(c)
-
 	if errResponse != nil {
 		return nil, errResponse
 	}
-
 	parts := strings.Split(c.Param("codeName"), "_")
-
 	if len(parts) != 2 {
 		errorResponse := &ErrorResponse{Message: "Invalid code names"}
 		return nil, errorResponse
 	}
-
 	groupId, err := strconv.ParseUint(parts[1], 10, 64)
-
 	if err != nil {
 		errorResponse := &ErrorResponse{Message: "Invalid code name"}
 		return nil, errorResponse
 	}
-
 	return &ValidationData{
 		CodeName: entity.CodeName{
 			Name:    parts[0],
@@ -278,12 +271,10 @@ type ValidateTimeStampResult struct {
 
 func ValidateTimeStamp(c *gin.Context) (*ValidateTimeStampResult, *ErrorResponse) {
 	fromTimestamp, err := strconv.ParseInt(c.Query("from"), 10, 64)
-
 	if err != nil {
 		errorResponse := &ErrorResponse{Message: "Invalid from unix timestamp"}
 		return nil, errorResponse
 	}
-
 	tillTimestamp, err := strconv.ParseInt(c.Query("till"), 10, 64)
 	if err != nil {
 		errorResponse := &ErrorResponse{Message: "Invalid till unix timestamp"}
