@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/srik007/sensor-api/domain/entity"
 	"github.com/srik007/sensor-api/domain/valueObjects"
@@ -115,4 +117,23 @@ func TestMinTemparatureInsideAGroup(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.StatusCode)
 	assert.Equal(t, float64(200), minTemperature.Value)
 	assert.Equal(t, "Celsius", minTemperature.Scale)
+}
+
+func TestAverageTemparatureDetectedBySensor(t *testing.T) {
+	var averageTemparature valueObjects.Temparature
+	currentTimestamp := int64(time.Now().Unix())
+	response, err := http.Get(BASE_URL + "/sensor/Group1_1/temparature/average?from=1697438904&till=" + strconv.FormatInt(currentTimestamp, 10))
+	body, err := io.ReadAll(response.Body)
+	fmt.Println(body)
+	err = json.Unmarshal(body, &averageTemparature)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return
+	}
+	assert.NoError(t, err)
+	defer response.Body.Close()
+
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+	assert.Equal(t, float64(200), averageTemparature.Value)
+	assert.Equal(t, "Celsius", averageTemparature.Scale)
 }

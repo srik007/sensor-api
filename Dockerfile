@@ -4,14 +4,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN rm .env
-
 RUN go mod download
 
 RUN go build -o main .
 
 EXPOSE 8080
-
-RUN sleep 50
 
 CMD [ "./main"]
