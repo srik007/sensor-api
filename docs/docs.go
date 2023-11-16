@@ -139,6 +139,33 @@ const docTemplate = `{
                 }
             }
         },
+        "/group/{groupName}/transparency": {
+            "get": {
+                "description": "Collect average transparency",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Collect average transparency of all the sensors transparency under given group",
+                "operationId": "collect-avg-transparency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group name",
+                        "name": "groupName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/interfaces.AverageTransparencyResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/region/temparature/max": {
             "get": {
                 "description": "Calculate maximum temparature",

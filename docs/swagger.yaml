@@ -150,6 +150,25 @@ paths:
             $ref: '#/definitions/interfaces.AverageTransparencyResponse'
       summary: Collect average temparature of all the sensors temparature under given
         group
+  /group/{groupName}/transparency:
+    get:
+      description: Collect average transparency
+      operationId: collect-avg-transparency
+      parameters:
+      - description: Group name
+        in: path
+        name: groupName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/interfaces.AverageTransparencyResponse'
+      summary: Collect average transparency of all the sensors transparency under
+        given group
   /region/temparature/max:
     get:
       description: Calculate maximum temparature

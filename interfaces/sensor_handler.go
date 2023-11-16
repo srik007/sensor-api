@@ -109,7 +109,7 @@ func (s *SensorHandler) CollectTopNSpeciesUnderGroup(c *gin.Context) {
 // @Success 200 {object} AverageTransparencyResponse "Successful response"
 // @Produce json
 // @Param groupName path string true "Group name"
-// @Router /group/{groupName}/temparature [get]
+// @Router /group/{groupName}/transparency [get]
 func (s *SensorHandler) CollectAverageTransparencyUnderGroup(c *gin.Context) {
 	groupName := c.Param("groupName")
 	result := s.CacheStore.VerifyCache(c, groupName)
