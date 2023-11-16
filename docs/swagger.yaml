@@ -64,7 +64,7 @@ info:
   title: Underwater Sensor API
   version: "1.0"
 paths:
-  /createMetadata:
+  /create-metadata:
     post:
       description: Create the meta data for sensors and sensor groups
       operationId: create-sensor-metadata

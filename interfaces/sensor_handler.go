@@ -42,7 +42,7 @@ func NewSensorHandler(s repository.SensorRepository, sg repository.SensorGroupRe
 // @Description Create the meta data for sensors and sensor groups
 // @ID create-sensor-metadata
 // @Success 200 {object} []entity.Sensor "Successfully response"
-// @Router /createMetadata [post]
+// @Router /create-metadata [post]
 func (s *SensorHandler) CreateMetadata(c *gin.Context) {
 	sensors := s.sensorApp.CreateMetadata()
 	c.JSON(http.StatusOK, sensors)

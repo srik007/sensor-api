@@ -9,7 +9,7 @@
     "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
-        "/createMetadata": {
+        "/create-metadata": {
             "post": {
                 "description": "Create the meta data for sensors and sensor groups",
                 "summary": "Create sensor metadata and sensor group metadata",

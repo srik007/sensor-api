@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/createMetadata": {
+        "/create-metadata": {
             "post": {
                 "description": "Create the meta data for sensors and sensor groups",
                 "summary": "Create sensor metadata and sensor group metadata",
