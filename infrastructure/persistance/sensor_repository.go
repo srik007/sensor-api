@@ -20,24 +20,21 @@ func NewSensorRepository(db *gorm.DB) *SensorRepository {
 var _ repository.SensorRepository = &SensorRepository{}
 
 func (r *SensorRepository) SaveAll(sensors []entity.Sensor) ([]entity.Sensor, map[string]string) {
+	var result []entity.Sensor
 	for _, sensor := range sensors {
 		var existingSensorGroup entity.SensorGroup
 		if err := r.db.Where("name = ?", sensor.CodeName.Name).First(&existingSensorGroup).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				sensor.CodeName.GroupId = 1
-			} else {
-				panic("Error retrieving sensor: " + err.Error())
-			}
+			panic("Configure sensor groups: " + err.Error())
 		} else {
 			sensor.CodeName.GroupId = uint64(existingSensorGroup.SensorCount) + 1
 		}
-		result := r.db.Create(&sensor)
-		if result.Error != nil {
-			panic(result.Error)
+		tx := r.db.Create(&sensor)
+		if tx.Error != nil {
+			panic(tx.Error)
 		}
-
+		result = append(result, sensor)
 	}
-	return sensors, nil
+	return result, nil
 }
 
 func (r *SensorRepository) GetAll() []entity.Sensor {

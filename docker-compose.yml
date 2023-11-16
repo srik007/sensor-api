@@ -29,9 +29,7 @@ services:
     ports:
       - "6379:6379"
   go-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: app:latest
     depends_on:
       - postgres
       - redis

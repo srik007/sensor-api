@@ -41,11 +41,11 @@ func NewSensorHandler(s repository.SensorRepository, sg repository.SensorGroupRe
 // @Summary Create sensor metadata and sensor group metadata
 // @Description Create the meta data for sensors and sensor groups
 // @ID create-sensor-metadata
-// @Success 200 {text} Sensor metadata created successfully.
+// @Success 200 {object} []entity.Sensor "Successfully response"
 // @Router /createMetadata [post]
 func (s *SensorHandler) CreateMetadata(c *gin.Context) {
-	s.sensorApp.CreateMetadata()
-	c.JSON(http.StatusOK, "Sensor metadata created successfully.")
+	sensors := s.sensorApp.CreateMetadata()
+	c.JSON(http.StatusOK, sensors)
 }
 
 // @Summary Background job to sendule sensors and generate the data for given sensors & Also schedule the backgorund job to do the aggregations on generated data.
@@ -157,7 +157,7 @@ type ErrorResponse struct {
 // @Param yMax query float64 true "Maximum y"
 // @Param zMin query float64 true "Minimum z"
 // @Param zMax query float64 true "Maximum z"
-// @Router /region/temperature/min [get]
+// @Router /region/temparature/min [get]
 func (s *SensorHandler) CalculateMinTemparatureInsideARegion(c *gin.Context) {
 	xMin, _ := strconv.ParseFloat(c.Query("xMin"), 64)
 	xMax, _ := strconv.ParseFloat(c.Query("xMax"), 64)
@@ -187,7 +187,7 @@ func (s *SensorHandler) CalculateMinTemparatureInsideARegion(c *gin.Context) {
 // @Param yMax query float64 true "Maximum y"
 // @Param zMin query float64 true "Minimum z"
 // @Param zMax query float64 true "Maximum z"
-// @Router /region/temperature/max [get]
+// @Router /region/temparature/max [get]
 func (s *SensorHandler) CalculateMaxTemparatureInsideARegion(c *gin.Context) {
 	xMin, _ := strconv.ParseFloat(c.Query("xMin"), 64)
 	xMax, _ := strconv.ParseFloat(c.Query("xMax"), 64)

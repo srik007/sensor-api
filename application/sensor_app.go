@@ -31,7 +31,7 @@ func NewSensorApp(s repository.SensorRepository, sg repository.SensorGroupReposi
 }
 
 type SensorAppInterface interface {
-	CreateMetadata()
+	CreateMetadata() []entity.Sensor
 	Schedule(c *gin.Context)
 	CollectSpeciesUnderGroup(groupName string) entity.Species
 	CollectTopNSpeciesUnderGroup(groupName string, topN int) entity.Species
@@ -44,9 +44,10 @@ type SensorAppInterface interface {
 
 var _ SensorAppInterface = &SensorApp{}
 
-func (s *SensorApp) CreateMetadata() {
-	s.MetadataCreator.CreateSensorMetadata()
+func (s *SensorApp) CreateMetadata() []entity.Sensor {
 	s.MetadataCreator.CreateSensorGroupMetaData()
+	sensors := s.MetadataCreator.CreateSensorMetadata()
+	return sensors
 }
 
 func (s *SensorApp) Schedule(c *gin.Context) {

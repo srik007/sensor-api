@@ -45,7 +45,9 @@ func main() {
 
 	defer services.Close()
 
-	services.Automigrate()
+	if os.Getenv("APP_ENV") != "test" {
+		services.Automigrate()
+	}
 
 	sensorHandler := interfaces.NewSensorHandler(services.SensorRepository, services.SensorGroupRepository, services.DataStore, cahce)
 
@@ -56,9 +58,9 @@ func main() {
 	v1 := r.Group("/api/v1")
 	{
 
-		v1.POST("create-metadata", sensorHandler.CreateMetadata)
+		v1.POST("/create-metadata", sensorHandler.CreateMetadata)
 
-		v1.POST("schedule", sensorHandler.ScheduleJob)
+		v1.POST("/schedule", sensorHandler.ScheduleJob)
 
 		v1.GET("/group/:groupName/transparency", sensorHandler.CollectAverageTransparencyUnderGroup)
 
@@ -68,9 +70,9 @@ func main() {
 
 		v1.GET("/group/:groupName/species/top/:topN", sensorHandler.CollectTopNSpeciesUnderGroup)
 
-		v1.GET("/region/temperature/min", sensorHandler.CalculateMinTemparatureInsideARegion)
+		v1.GET("/region/temparature/min", sensorHandler.CalculateMinTemparatureInsideARegion)
 
-		v1.GET("/region/temperature/max", sensorHandler.CalculateMaxTemparatureInsideARegion)
+		v1.GET("/region/temparature/max", sensorHandler.CalculateMaxTemparatureInsideARegion)
 
 		v1.GET("/sensor/:codeName/temparature/average", sensorHandler.CalculateAverageTemparatureBySensor)
 

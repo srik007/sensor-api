@@ -4,14 +4,14 @@ WORKDIR /app
 
 COPY . .
 
+RUN rm .env
+
 RUN go mod download
-
-RUN go get -u github.com/swaggo/swag/cmd/swag
-
-RUN swag init
 
 RUN go build -o main .
 
 EXPOSE 8080
 
-CMD ["./main"]
+RUN sleep 50
+
+CMD [ "./main"]

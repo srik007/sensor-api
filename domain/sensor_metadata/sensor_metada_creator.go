@@ -29,9 +29,13 @@ var sensorGroupNames = []string{
 	"Phi", "Chi", "Psi", "Omega",
 }
 
-func (m *MetadataCreator) CreateSensorMetadata() {
+func (m *MetadataCreator) CreateSensorMetadata() []entity.Sensor {
 	var sensors []entity.Sensor
 	numberOfSensors, err := strconv.Atoi(os.Getenv("NUMBER_OF_SENSORS"))
+	existingSensors := m.SensorRepository.GetAll()
+	if len(existingSensors) > 0 {
+		return existingSensors
+	}
 	if err != nil {
 		fmt.Println("Invalid number of sensors configured.")
 		numberOfSensors = 4
@@ -45,10 +49,11 @@ func (m *MetadataCreator) CreateSensorMetadata() {
 		sensor := entity.Sensor{CodeName: codeName, Coordinate: coordiante, DataOutputRate: dataOutputRate}
 		sensors = append(sensors, sensor)
 	}
-	_, error := m.SensorRepository.SaveAll(sensors)
+	result, error := m.SensorRepository.SaveAll(sensors)
 	if error != nil {
 		fmt.Errorf("Failed to generate sensor data.")
 	}
+	return result
 }
 
 func (m *MetadataCreator) CreateSensorGroupMetaData() {
